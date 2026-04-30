@@ -25,24 +25,23 @@ private const val API_KEY = "d18da1b5da16397619c688b0263cd281"
 
 object MoviesDependencyInjector {
 
-    private val tmdbHttpClient =
-        HttpClient {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                })
-            }
-            install(DefaultRequest) {
-                url {
-                    protocol = URLProtocol.HTTPS
-                    host = "api.themoviedb.org"
-                    parameters.append("api_key", API_KEY)
-                }
-            }
-            install(HttpTimeout) {
-                requestTimeoutMillis = 5000
+    private val tmdbHttpClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+        install(DefaultRequest) {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = "api.themoviedb.org"
+                parameters.append("api_key", API_KEY)
             }
         }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 5000
+        }
+    }
 
     private val apiService: MoviesApiService = MoviesApiServiceImpl(tmdbHttpClient)
 
