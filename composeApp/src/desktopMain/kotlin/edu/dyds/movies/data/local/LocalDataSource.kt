@@ -1,6 +1,8 @@
 package edu.dyds.movies.data.local
 
-// Placeholder interface for future local data sources (e.g., database, cache)
+import edu.dyds.movies.domain.entity.Movie
+
 interface LocalDataSource {
-    // Stub for future implementation
+    fun getMovies(): List<Movie>
+    fun saveMovies(movies: List<Movie>)
 }

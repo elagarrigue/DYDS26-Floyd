@@ -1,22 +1,24 @@
 package edu.dyds.movies.data
 
 import edu.dyds.movies.data.external.MoviesApiService
+import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
 
-class MoviesRepositoryImpl(private val apiService: MoviesApiService) : MoviesRepository {
-
-    private val cacheMovies: MutableList<Movie> = mutableListOf()
+class MoviesRepositoryImpl(
+    private val apiService: MoviesApiService,
+    private val localDataSource: LocalDataSource
+) : MoviesRepository {
 
     override suspend fun getPopularMovies(): List<Movie> {
-        if (cacheMovies.isNotEmpty()) {
-            return cacheMovies
+        val cached = localDataSource.getMovies()
+        if (cached.isNotEmpty()) {
+            return cached
         }
         return try {
-            apiService.getPopularMovies().results.map { it.toDomainMovie() }.apply {
-                cacheMovies.clear()
-                cacheMovies.addAll(this)
-            }
+            val movies = apiService.getPopularMovies().results.map { it.toDomainMovie() }
+            localDataSource.saveMovies(movies)
+            movies
         } catch (e: Exception) {
             emptyList()
         }
