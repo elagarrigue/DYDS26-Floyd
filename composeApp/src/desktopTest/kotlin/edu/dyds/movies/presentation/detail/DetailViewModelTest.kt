@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,9 +16,17 @@ import kotlin.test.assertEquals
 class DetailViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
+    private lateinit var useCase: FakeGetMovieDetailsUseCase
+    private lateinit var viewModel: DetailViewModel
+    private val states = mutableListOf<DetailUiState>()
 
-    init {
+    @BeforeTest
+    fun setup() {
+        // Arrange común para todos los tests
         Dispatchers.setMain(testDispatcher)
+        useCase = FakeGetMovieDetailsUseCase()
+        viewModel = DetailViewModel(useCase)
+        states.clear()
     }
 
     private class FakeGetMovieDetailsUseCase : GetMovieDetailsUseCase {
@@ -33,9 +42,6 @@ class DetailViewModelTest {
     @Test
     fun `loadMovie should update uiState with movie on success`() = runTest(testDispatcher) {
         // arrange
-        val useCase = FakeGetMovieDetailsUseCase()
-        val viewModel = DetailViewModel(useCase)
-        val states = mutableListOf<DetailUiState>()
         val job = launch { viewModel.uiState.collect { states.add(it) } }
 
         // act
@@ -52,9 +58,7 @@ class DetailViewModelTest {
     @Test
     fun `loadMovie should update uiState with null movie on failure`() = runTest(testDispatcher) {
         // arrange
-        val useCase = FakeGetMovieDetailsUseCase().apply { shouldFail = true }
-        val viewModel = DetailViewModel(useCase)
-        val states = mutableListOf<DetailUiState>()
+        useCase.shouldFail = true
         val job = launch { viewModel.uiState.collect { states.add(it) } }
 
         // act

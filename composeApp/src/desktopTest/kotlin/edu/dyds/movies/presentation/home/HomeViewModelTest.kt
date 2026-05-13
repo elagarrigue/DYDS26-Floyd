@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -16,9 +17,17 @@ import kotlin.test.assertEquals
 class HomeViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
+    private lateinit var useCase: FakeGetPopularMoviesUseCase
+    private lateinit var viewModel: HomeViewModel
+    private val states = mutableListOf<HomeUiState>()
 
-    init {
+    @BeforeTest
+    fun setup() {
+        // Arrange común para todos los tests
         Dispatchers.setMain(testDispatcher)
+        useCase = FakeGetPopularMoviesUseCase()
+        viewModel = HomeViewModel(useCase)
+        states.clear()
     }
 
     private class FakeGetPopularMoviesUseCase : GetPopularMoviesUseCase {
@@ -36,9 +45,6 @@ class HomeViewModelTest {
     @Test
     fun `loadMovies should update uiState with movies on success`() = runTest(testDispatcher) {
         // arrange
-        val useCase = FakeGetPopularMoviesUseCase()
-        val viewModel = HomeViewModel(useCase)
-        val states = mutableListOf<HomeUiState>()
         val job = launch { viewModel.uiState.collect { states.add(it) } }
 
         // act
@@ -55,9 +61,7 @@ class HomeViewModelTest {
     @Test
     fun `loadMovies should update uiState with empty movies on failure`() = runTest(testDispatcher) {
         // arrange
-        val useCase = FakeGetPopularMoviesUseCase().apply { shouldFail = true }
-        val viewModel = HomeViewModel(useCase)
-        val states = mutableListOf<HomeUiState>()
+        useCase.shouldFail = true
         val job = launch { viewModel.uiState.collect { states.add(it) } }
 
         // act
