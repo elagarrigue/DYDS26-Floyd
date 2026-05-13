@@ -6,7 +6,6 @@ import kotlin.test.assertEquals
 
 class LocalDataSourceImplTest {
 
-    private val localDataSource = LocalDataSourceImpl()
 
     @Test
     fun `getMovies should return empty list when no movies saved`() {
