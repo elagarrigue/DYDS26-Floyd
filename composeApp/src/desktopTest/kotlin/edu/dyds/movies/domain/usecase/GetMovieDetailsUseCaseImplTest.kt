@@ -9,34 +9,48 @@ import kotlin.test.assertEquals
 class GetMovieDetailsUseCaseImplTest {
 
     private class FakeMoviesRepository : MoviesRepository {
-        var movie: Movie? = Movie(1, "Title1", "Overview1", "2023-01-01", "poster1", "backdrop1", "Original1", "en", 10.0, 7.0)
+        var movieToReturn: Movie? = null
 
         override suspend fun getPopularMovies(): List<Movie> = emptyList()
 
-        override suspend fun getMovieDetails(id: Int): Movie? = if (id == 1) movie else null
+        override suspend fun getMovieDetails(id: Int): Movie? = movieToReturn
     }
 
+    private fun buildMovie(id: Int) = Movie(
+        id = id,
+        title = "Title$id",
+        overview = "Overview$id",
+        releaseDate = "2023-01-01",
+        poster = "poster$id",
+        backdrop = "backdrop$id",
+        originalTitle = "Original$id",
+        originalLanguage = "en",
+        popularity = 10.0,
+        voteAverage = 7.0
+    )
+
     @Test
-    fun `execute should return movie when found`() = runTest {
+    fun `execute deberia retornar la pelicula cuando el repositorio la encuentra`() = runTest {
         // arrange
-        val repository = FakeMoviesRepository()
+        val movie = buildMovie(1)
+        val repository = FakeMoviesRepository().apply { movieToReturn = movie }
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
         // act
         val result = useCase.execute(1)
 
         // assert
-        assertEquals(repository.movie, result)
+        assertEquals(movie, result)
     }
 
     @Test
-    fun `execute should return null when not found`() = runTest {
+    fun `execute deberia retornar null cuando el repositorio no encuentra la pelicula`() = runTest {
         // arrange
-        val repository = FakeMoviesRepository()
+        val repository = FakeMoviesRepository().apply { movieToReturn = null }
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
         // act
-        val result = useCase.execute(2)
+        val result = useCase.execute(99)
 
         // assert
         assertEquals(null, result)

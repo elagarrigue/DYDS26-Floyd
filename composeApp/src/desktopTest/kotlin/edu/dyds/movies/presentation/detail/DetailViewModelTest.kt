@@ -1,7 +1,7 @@
+package edu.dyds.movies.presentation.detail
+
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.usecase.GetMovieDetailsUseCase
-import edu.dyds.movies.presentation.detail.DetailUiState
-import edu.dyds.movies.presentation.detail.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -11,27 +11,25 @@ import kotlinx.coroutines.test.setMain
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DetailViewModelTest {
 
-    private val testDispatcher = StandardTestDispatcher()
-    private lateinit var useCase: FakeGetMovieDetailsUseCase
-    private lateinit var viewModel: DetailViewModel
-    private val states = mutableListOf<DetailUiState>()
-
-    @BeforeTest
-    fun setup() {
-        // Arrange común para todos los tests
-        Dispatchers.setMain(testDispatcher)
-        useCase = FakeGetMovieDetailsUseCase()
-        viewModel = DetailViewModel(useCase)
-        states.clear()
-    }
-
     private class FakeGetMovieDetailsUseCase : GetMovieDetailsUseCase {
         var shouldFail = false
-        var movie: Movie? = Movie(1, "Title1", "Overview1", "2023-01-01", "poster1", "backdrop1", "Original1", "en", 10.0, 7.0)
+        var movie: Movie? = Movie(
+            id = 1,
+            title = "Title1",
+            overview = "Overview1",
+            releaseDate = "2023-01-01",
+            poster = "poster1",
+            backdrop = "backdrop1",
+            originalTitle = "Original1",
+            originalLanguage = "en",
+            popularity = 10.0,
+            voteAverage = 7.0
+        )
 
         override suspend fun execute(id: Int): Movie? {
             if (shouldFail) throw Exception("Use case error")
@@ -39,36 +37,81 @@ class DetailViewModelTest {
         }
     }
 
-    @Test
-    fun `loadMovie should update uiState with movie on success`() = runTest(testDispatcher) {
-        // arrange
-        val job = launch { viewModel.uiState.collect { states.add(it) } }
+    private val testDispatcher = StandardTestDispatcher()
+    private lateinit var useCase: FakeGetMovieDetailsUseCase
+    private lateinit var viewModel: DetailViewModel
 
-        // act
-        viewModel.loadMovie(1)
-        testDispatcher.scheduler.advanceUntilIdle()
-
-        // assert
-        job.cancel()
-        val finalState = states.last()
-        assertEquals(false, finalState.isLoading)
-        assertEquals(useCase.movie, finalState.movie)
+    @BeforeTest
+    fun setup() {
+        // arrange comun
+        Dispatchers.setMain(testDispatcher)
+        useCase = FakeGetMovieDetailsUseCase()
+        viewModel = DetailViewModel(useCase)
     }
 
     @Test
-    fun `loadMovie should update uiState with null movie on failure`() = runTest(testDispatcher) {
-        // arrange
-        useCase.shouldFail = true
-        val job = launch { viewModel.uiState.collect { states.add(it) } }
+    fun `loadMovie deberia actualizar uiState con la pelicula cuando el caso de uso tiene exito`() =
+        runTest(testDispatcher) {
+            // arrange
+            val states = mutableListOf<DetailUiState>()
+            val job = launch { viewModel.uiState.collect { states.add(it) } }
 
-        // act
-        viewModel.loadMovie(1)
-        testDispatcher.scheduler.advanceUntilIdle()
+            // act
+            viewModel.loadMovie(1)
+            testDispatcher.scheduler.advanceUntilIdle()
 
-        // assert
-        job.cancel()
-        val finalState = states.last()
-        assertEquals(false, finalState.isLoading)
-        assertEquals(null, finalState.movie)
-    }
+            // assert
+            job.cancel()
+            assertEquals(useCase.movie, states.last().movie)
+        }
+
+    @Test
+    fun `loadMovie deberia dejar isLoading en false cuando el caso de uso tiene exito`() =
+        runTest(testDispatcher) {
+            // arrange
+            val states = mutableListOf<DetailUiState>()
+            val job = launch { viewModel.uiState.collect { states.add(it) } }
+
+            // act
+            viewModel.loadMovie(1)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // assert
+            job.cancel()
+            assertFalse(states.last().isLoading)
+        }
+
+    @Test
+    fun `loadMovie deberia actualizar uiState con pelicula null cuando el caso de uso falla`() =
+        runTest(testDispatcher) {
+            // arrange
+            useCase.shouldFail = true
+            val states = mutableListOf<DetailUiState>()
+            val job = launch { viewModel.uiState.collect { states.add(it) } }
+
+            // act
+            viewModel.loadMovie(1)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // assert
+            job.cancel()
+            assertEquals(null, states.last().movie)
+        }
+
+    @Test
+    fun `loadMovie deberia dejar isLoading en false cuando el caso de uso falla`() =
+        runTest(testDispatcher) {
+            // arrange
+            useCase.shouldFail = true
+            val states = mutableListOf<DetailUiState>()
+            val job = launch { viewModel.uiState.collect { states.add(it) } }
+
+            // act
+            viewModel.loadMovie(1)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            // assert
+            job.cancel()
+            assertFalse(states.last().isLoading)
+        }
 }
