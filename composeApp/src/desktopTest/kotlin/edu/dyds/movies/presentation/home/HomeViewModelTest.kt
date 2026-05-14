@@ -1,14 +1,15 @@
 package edu.dyds.movies.presentation.home
 
-import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.entity.QualifiedMovie
-import edu.dyds.movies.domain.usecase.GetPopularMoviesUseCase
+import edu.dyds.movies.presentation.fakes.FakeGetPopularMoviesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,31 +18,20 @@ import kotlin.test.assertFalse
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
 
-    private class FakeGetPopularMoviesUseCase : GetPopularMoviesUseCase {
-        var shouldFail = false
-        var movies = listOf(
-            QualifiedMovie(
-                Movie(1, "Title1", "Overview1", "2023-01-01", "poster1", "backdrop1", "Original1", "en", 10.0, 7.0),
-                isGoodMovie = true
-            )
-        )
-
-        override suspend fun execute(): List<QualifiedMovie> {
-            if (shouldFail) throw Exception("Use case error")
-            return movies
-        }
-    }
-
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var useCase: FakeGetPopularMoviesUseCase
     private lateinit var viewModel: HomeViewModel
 
     @BeforeTest
     fun setup() {
-        // arrange comun
         Dispatchers.setMain(testDispatcher)
         useCase = FakeGetPopularMoviesUseCase()
         viewModel = HomeViewModel(useCase)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -49,16 +39,14 @@ class HomeViewModelTest {
         runTest(testDispatcher) {
             // arrange
             val states = mutableListOf<HomeUiState>()
-            val job = launch { viewModel.uiState.collect { states.add(it) } }
+            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
-            testDispatcher.scheduler.advanceUntilIdle()
 
             // assert
             job.cancel()
-            val finalState = states.last()
-            assertEquals(useCase.movies, finalState.movies)
+            assertEquals(useCase.movies, states.last().movies)
         }
 
     @Test
@@ -66,11 +54,10 @@ class HomeViewModelTest {
         runTest(testDispatcher) {
             // arrange
             val states = mutableListOf<HomeUiState>()
-            val job = launch { viewModel.uiState.collect { states.add(it) } }
+            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
-            testDispatcher.scheduler.advanceUntilIdle()
 
             // assert
             job.cancel()
@@ -83,11 +70,10 @@ class HomeViewModelTest {
             // arrange
             useCase.shouldFail = true
             val states = mutableListOf<HomeUiState>()
-            val job = launch { viewModel.uiState.collect { states.add(it) } }
+            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
-            testDispatcher.scheduler.advanceUntilIdle()
 
             // assert
             job.cancel()
@@ -100,11 +86,10 @@ class HomeViewModelTest {
             // arrange
             useCase.shouldFail = true
             val states = mutableListOf<HomeUiState>()
-            val job = launch { viewModel.uiState.collect { states.add(it) } }
+            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
-            testDispatcher.scheduler.advanceUntilIdle()
 
             // assert
             job.cancel()

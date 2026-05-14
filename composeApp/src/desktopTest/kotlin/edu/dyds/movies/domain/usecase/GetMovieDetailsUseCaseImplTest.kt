@@ -1,20 +1,12 @@
 package edu.dyds.movies.domain.usecase
 
 import edu.dyds.movies.domain.entity.Movie
-import edu.dyds.movies.domain.repository.MoviesRepository
+import edu.dyds.movies.domain.fakes.FakeMoviesRepository
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GetMovieDetailsUseCaseImplTest {
-
-    private class FakeMoviesRepository : MoviesRepository {
-        var movieToReturn: Movie? = null
-
-        override suspend fun getPopularMovies(): List<Movie> = emptyList()
-
-        override suspend fun getMovieDetails(id: Int): Movie? = movieToReturn
-    }
 
     private fun buildMovie(id: Int) = Movie(
         id = id,
