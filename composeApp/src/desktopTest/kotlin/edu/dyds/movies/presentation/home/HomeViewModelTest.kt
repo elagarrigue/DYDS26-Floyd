@@ -2,6 +2,7 @@ package edu.dyds.movies.presentation.home
 
 import edu.dyds.movies.domain.entity.QualifiedMovie
 import edu.dyds.movies.presentation.fakes.FakeGetPopularMoviesUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ import kotlin.test.assertFalse
 class HomeViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val testScope = CoroutineScope(testDispatcher)
     private lateinit var useCase: FakeGetPopularMoviesUseCase
     private lateinit var viewModel: HomeViewModel
 
@@ -36,10 +38,10 @@ class HomeViewModelTest {
 
     @Test
     fun `loadMovies deberia actualizar uiState con las peliculas cuando el caso de uso tiene exito`() =
-        runTest(testDispatcher) {
+        runTest {
             // arrange
             val states = mutableListOf<HomeUiState>()
-            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
+            val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
@@ -51,10 +53,10 @@ class HomeViewModelTest {
 
     @Test
     fun `loadMovies deberia dejar isLoading en false cuando el caso de uso tiene exito`() =
-        runTest(testDispatcher) {
+        runTest {
             // arrange
             val states = mutableListOf<HomeUiState>()
-            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
+            val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
@@ -66,11 +68,11 @@ class HomeViewModelTest {
 
     @Test
     fun `loadMovies deberia actualizar uiState con lista vacia cuando el caso de uso falla`() =
-        runTest(testDispatcher) {
+        runTest {
             // arrange
             useCase.shouldFail = true
             val states = mutableListOf<HomeUiState>()
-            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
+            val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()
@@ -82,11 +84,11 @@ class HomeViewModelTest {
 
     @Test
     fun `loadMovies deberia dejar isLoading en false cuando el caso de uso falla`() =
-        runTest(testDispatcher) {
+        runTest {
             // arrange
             useCase.shouldFail = true
             val states = mutableListOf<HomeUiState>()
-            val job = launch(testDispatcher) { viewModel.uiState.collect { states.add(it) } }
+            val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
             viewModel.loadMovies()

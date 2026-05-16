@@ -1,11 +1,19 @@
 package edu.dyds.movies.data.local
 
 import edu.dyds.movies.domain.entity.Movie
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class LocalDataSourceImplTest {
+
+    private lateinit var localDataSource: LocalDataSourceImpl
+
+    @BeforeTest
+    fun setUp() {
+        localDataSource = LocalDataSourceImpl()
+    }
 
     private fun buildMovie(id: Int, title: String = "Title$id") = Movie(
         id = id,
@@ -23,7 +31,6 @@ class LocalDataSourceImplTest {
     @Test
     fun `getMovies deberia retornar lista vacia cuando no se guardaron peliculas`() {
         // arrange
-        val localDataSource = LocalDataSourceImpl()
 
         // act
         val result = localDataSource.getMovies()
@@ -35,7 +42,6 @@ class LocalDataSourceImplTest {
     @Test
     fun `saveMovies deberia guardar las peliculas y getMovies deberia retornarlas`() {
         // arrange
-        val localDataSource = LocalDataSourceImpl()
         val movies = listOf(buildMovie(1), buildMovie(2))
 
         // act
@@ -49,7 +55,6 @@ class LocalDataSourceImplTest {
     @Test
     fun `saveMovies deberia sobreescribir las peliculas anteriores`() {
         // arrange
-        val localDataSource = LocalDataSourceImpl()
         localDataSource.saveMovies(listOf(buildMovie(1)))
         val newMovies = listOf(buildMovie(2))
 
@@ -64,7 +69,6 @@ class LocalDataSourceImplTest {
     @Test
     fun `saveMovies con lista vacia deberia limpiar el cache`() {
         // arrange
-        val localDataSource = LocalDataSourceImpl()
         localDataSource.saveMovies(listOf(buildMovie(1)))
 
         // act
@@ -78,7 +82,6 @@ class LocalDataSourceImplTest {
     @Test
     fun `getMovies deberia retornar la cantidad correcta de peliculas guardadas`() {
         // arrange
-        val localDataSource = LocalDataSourceImpl()
         val movies = listOf(buildMovie(1), buildMovie(2), buildMovie(3))
         localDataSource.saveMovies(movies)
 
