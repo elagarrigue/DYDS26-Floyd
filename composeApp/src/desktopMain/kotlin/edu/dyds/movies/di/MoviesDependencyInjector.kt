@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
 import edu.dyds.movies.data.external.MovieExternalSource
 import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.omdb.OMDBMoviesExternalSource
 import edu.dyds.movies.data.external.tmdb.TMDBMoviesExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.data.local.LocalDataSourceImpl
@@ -43,6 +44,8 @@ object MoviesDependencyInjector {
             requestTimeoutMillis = 5000
         }
     }
+
+    private val omdbSource: OMDBMoviesExternalSource = OMDBMoviesExternalSource()
 
     private val tmdbSource: TMDBMoviesExternalSource = TMDBMoviesExternalSource(tmdbHttpClient)
 
