@@ -31,4 +31,12 @@ class MoviesRepositoryImpl(
             null
         }
     }
+
+    override suspend fun getMovieByTitle(title: String): Movie? {
+        return try {
+            apiService.getMovieByTitle(title).toDomainMovie()
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

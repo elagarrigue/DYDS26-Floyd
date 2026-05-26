@@ -101,4 +101,26 @@ class MoviesRepositoryImplTest {
         // assert
         assertEquals(null, result)
     }
+
+    @Test
+    fun `getMovieByTitle deberia retornar la pelicula cuando la API la encuentra`() = runTest {
+        // act
+        val result = repository.getMovieByTitle("Title1")
+
+        // assert
+        val expected = apiService.popularMovies.first { it.title == "Title1" }.toDomainMovie()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `getMovieByTitle deberia retornar null cuando la API falla`() = runTest {
+        // arrange
+        apiService.shouldFail = true
+
+        // act
+        val result = repository.getMovieByTitle("Title1")
+
+        // assert
+        assertEquals(null, result)
+    }
 }

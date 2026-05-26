@@ -11,4 +11,10 @@ class MoviesApiServiceImpl(private val httpClient: HttpClient) : MoviesApiServic
 
     override suspend fun getMovieDetails(id: Int): RemoteMovie =
         httpClient.get("/3/movie/$id").body()
+
+    override suspend fun getMovieByTitle(title: String): RemoteMovie =
+        getTMDBMovieDetails(title)
+
+    private suspend fun getTMDBMovieDetails(title: String): RemoteMovie =
+        httpClient.get("/3/search/movie?query=${title}").body<RemoteResult>().results.first()
 }

@@ -22,4 +22,11 @@ class FakeMoviesApiService : MoviesApiService {
         if (shouldFail) throw Exception("API error")
         return movieDetails ?: throw Exception("Not found")
     }
+
+    override suspend fun getMovieByTitle(title: String): RemoteMovie {
+        if (shouldFail) throw Exception("API error")
+        return popularMovies.firstOrNull { it.title == title }
+            ?: movieDetails
+            ?: throw Exception("Not found")
+    }
 }

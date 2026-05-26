@@ -43,7 +43,7 @@ class DetailViewModelTest {
             val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
-            viewModel.loadMovie(1)
+            viewModel.loadMovie("Title1")
 
             // assert
             job.cancel()
@@ -58,7 +58,7 @@ class DetailViewModelTest {
             val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
-            viewModel.loadMovie(1)
+            viewModel.loadMovie("Title1")
 
             // assert
             job.cancel()
@@ -74,7 +74,7 @@ class DetailViewModelTest {
             val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
-            viewModel.loadMovie(1)
+            viewModel.loadMovie("Title1")
 
             // assert
             job.cancel()
@@ -90,7 +90,7 @@ class DetailViewModelTest {
             val job = testScope.launch { viewModel.uiState.collect { states.add(it) } }
 
             // act
-            viewModel.loadMovie(1)
+            viewModel.loadMovie("Title1")
 
             // assert
             job.cancel()

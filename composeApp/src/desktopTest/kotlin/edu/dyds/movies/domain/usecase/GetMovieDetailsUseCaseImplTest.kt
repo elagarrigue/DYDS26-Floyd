@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
 
 class GetMovieDetailsUseCaseImplTest {
 
-    private fun buildMovie(id: Int) = Movie(
+    private fun buildMovie(id: Int, title: String = "Title$id") = Movie(
         id = id,
-        title = "Title$id",
+        title = title,
         overview = "Overview$id",
         releaseDate = "2023-01-01",
         poster = "poster$id",
@@ -22,27 +22,27 @@ class GetMovieDetailsUseCaseImplTest {
     )
 
     @Test
-    fun `execute deberia retornar la pelicula cuando el repositorio la encuentra`() = runTest {
+    fun `invoke deberia retornar la pelicula cuando el repositorio la encuentra por titulo`() = runTest {
         // arrange
-        val movie = buildMovie(1)
+        val movie = buildMovie(1, "Title1")
         val repository = FakeMoviesRepository().apply { movieToReturn = movie }
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
         // act
-        val result = useCase.execute(1)
+        val result = useCase("Title1")
 
         // assert
         assertEquals(movie, result)
     }
 
     @Test
-    fun `execute deberia retornar null cuando el repositorio no encuentra la pelicula`() = runTest {
+    fun `invoke deberia retornar null cuando el repositorio no encuentra la pelicula`() = runTest {
         // arrange
         val repository = FakeMoviesRepository().apply { movieToReturn = null }
         val useCase = GetMovieDetailsUseCaseImpl(repository)
 
         // act
-        val result = useCase.execute(99)
+        val result = useCase("TituloInexistente")
 
         // assert
         assertEquals(null, result)

@@ -18,7 +18,7 @@ class FakeGetMovieDetailsUseCase : GetMovieDetailsUseCase {
         voteAverage = 7.0
     )
 
-    override suspend fun execute(id: Int): Movie? {
+    override suspend fun invoke(title: String): Movie? {
         if (shouldFail) throw Exception("Use case error")
         return movie
     }

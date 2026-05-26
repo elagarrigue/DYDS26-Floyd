@@ -15,11 +15,11 @@ class DetailViewModel(
 
     val uiState: StateFlow<DetailUiState> = _uiState
 
-    fun loadMovie(id: Int) {
+    fun loadMovie(title: String) {
         viewModelScope.launch {
             _uiState.value = DetailUiState(isLoading = true)
             try {
-                val movie = getMovieDetailsUseCase.execute(id)
+                val movie = getMovieDetailsUseCase(title)
                 _uiState.value = DetailUiState(isLoading = false, movie = movie)
             } catch (e: Exception) {
                 _uiState.value = DetailUiState(isLoading = false, movie = null)
