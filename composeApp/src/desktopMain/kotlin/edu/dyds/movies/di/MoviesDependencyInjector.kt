@@ -3,7 +3,8 @@ package edu.dyds.movies.di
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
-import edu.dyds.movies.data.external.MoviesApiService
+import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MoviesExternalSource
 import edu.dyds.movies.data.external.tmdb.TMDBMoviesExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.data.local.LocalDataSourceImpl
@@ -43,11 +44,15 @@ object MoviesDependencyInjector {
         }
     }
 
-    private val apiService: MoviesApiService = TMDBMoviesExternalSource(tmdbHttpClient)
+    private val tmdbSource: TMDBMoviesExternalSource = TMDBMoviesExternalSource(tmdbHttpClient)
+
+    private val moviesExternalSource: MoviesExternalSource = tmdbSource
+
+    private val movieExternalSource: MovieExternalSource = tmdbSource
 
     private val localDataSource: LocalDataSource = LocalDataSourceImpl()
 
-    private val repository: MoviesRepository = MoviesRepositoryImpl(apiService, localDataSource)
+    private val repository: MoviesRepository = MoviesRepositoryImpl(moviesExternalSource, movieExternalSource, localDataSource)
 
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase = GetPopularMoviesUseCaseImpl(repository)
 
