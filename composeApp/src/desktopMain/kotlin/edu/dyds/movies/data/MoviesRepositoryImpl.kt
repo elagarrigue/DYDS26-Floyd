@@ -1,12 +1,14 @@
 package edu.dyds.movies.data
 
-import edu.dyds.movies.data.external.MoviesApiService
+import edu.dyds.movies.data.external.MovieDetailExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
 import edu.dyds.movies.data.local.LocalDataSource
 import edu.dyds.movies.domain.entity.Movie
 import edu.dyds.movies.domain.repository.MoviesRepository
 
 class MoviesRepositoryImpl(
-    private val apiService: MoviesApiService,
+    private val moviesExternalSource: PopularMoviesExternalSource,
+    private val movieExternalSource: MovieDetailExternalSource,
     private val localDataSource: LocalDataSource
 ) : MoviesRepository {
 
@@ -16,7 +18,7 @@ class MoviesRepositoryImpl(
             return cached
         }
         return try {
-            val movies = apiService.getPopularMovies().results.map { it.toDomainMovie() }
+            val movies = moviesExternalSource.getPopularMovies()
             localDataSource.saveMovies(movies)
             movies
         } catch (e: Exception) {
@@ -24,9 +26,10 @@ class MoviesRepositoryImpl(
         }
     }
 
-    override suspend fun getMovieDetails(id: Int): Movie? {
+
+    override suspend fun getMovieByTitle(title: String): Movie? {
         return try {
-            apiService.getMovieDetails(id).toDomainMovie()
+            movieExternalSource.getMovieByTitle(title)
         } catch (e: Exception) {
             null
         }
