@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.external.omdb
 
-import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 
 private const val OMDB_API_KEY = "a96e7f78"
 
-class OMDBMoviesExternalSource : MovieExternalSource {
+class OMDBMoviesExternalSource : MovieDetailExternalSource {
 
     private val omdbHttpClient = HttpClient {
         install(ContentNegotiation) {

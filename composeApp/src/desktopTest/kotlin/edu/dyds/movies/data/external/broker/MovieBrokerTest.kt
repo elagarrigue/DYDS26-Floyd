@@ -1,6 +1,6 @@
 package edu.dyds.movies.data.external.broker
 
-import edu.dyds.movies.data.external.MovieExternalSource
+import edu.dyds.movies.data.fakes.FakeMovieExternalSource
 import edu.dyds.movies.domain.entity.Movie
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -82,15 +82,5 @@ class MovieBrokerTest {
         val result = broker.getMovieByTitle("Inception")
 
         assertNull(result)
-    }
-
-    private class FakeMovieExternalSource : MovieExternalSource {
-        var shouldFail = false
-        var movieToReturn: Movie? = null
-
-        override suspend fun getMovieByTitle(title: String): Movie? {
-            if (shouldFail) throw Exception("Source error")
-            return movieToReturn
-        }
     }
 }

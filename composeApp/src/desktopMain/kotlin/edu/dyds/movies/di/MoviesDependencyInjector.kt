@@ -3,8 +3,8 @@ package edu.dyds.movies.di
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import edu.dyds.movies.data.MoviesRepositoryImpl
-import edu.dyds.movies.data.external.MovieExternalSource
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.MovieDetailExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
 import edu.dyds.movies.data.external.broker.MovieBroker
 import edu.dyds.movies.data.external.omdb.OMDBMoviesExternalSource
 import edu.dyds.movies.data.external.tmdb.TMDBMoviesExternalSource
@@ -50,9 +50,9 @@ object MoviesDependencyInjector {
 
     private val tmdbSource: TMDBMoviesExternalSource = TMDBMoviesExternalSource(tmdbHttpClient)
 
-    private val moviesExternalSource: MoviesExternalSource = tmdbSource
+    private val moviesExternalSource: PopularMoviesExternalSource = tmdbSource
 
-    private val movieExternalSource: MovieExternalSource = MovieBroker(tmdbSource, omdbSource)
+    private val movieExternalSource: MovieDetailExternalSource = MovieBroker(tmdbSource, omdbSource)
 
     private val localDataSource: LocalDataSource = LocalDataSourceImpl()
 

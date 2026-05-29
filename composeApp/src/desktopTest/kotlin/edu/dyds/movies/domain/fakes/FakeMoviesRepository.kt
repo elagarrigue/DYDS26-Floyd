@@ -9,7 +9,6 @@ class FakeMoviesRepository : MoviesRepository {
 
     override suspend fun getPopularMovies(): List<Movie> = movies
 
-    override suspend fun getMovieDetails(id: Int): Movie? = movieToReturn ?: movies.find { it.id == id }
 
     override suspend fun getMovieByTitle(title: String): Movie? = movieToReturn ?: movies.find { it.title == title }
 }

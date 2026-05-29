@@ -1,9 +1,9 @@
 package edu.dyds.movies.data.fakes
 
-import edu.dyds.movies.data.external.MoviesExternalSource
+import edu.dyds.movies.data.external.PopularMoviesExternalSource
 import edu.dyds.movies.domain.entity.Movie
 
-class FakeMoviesExternalSource : MoviesExternalSource {
+class FakeMoviesExternalSource : PopularMoviesExternalSource {
     var shouldFail = false
     var movies: List<Movie> = listOf(
         Movie(1, "Title1", "Overview1", "2023-01-01", "poster1", "backdrop1", "Original1", "en", 10.0, 7.0),
